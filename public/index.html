@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#07080d" />
+  <title>Watchtower | System Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="text-slate-200 antialiased">
+  <main class="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+
+    <header class="flex flex-wrap items-center justify-between gap-3 mb-8">
+      <div>
+        <h1 class="mono text-xl sm:text-2xl font-bold text-white">zeix@bydefuse:~$ watchtower<span class="cursor">▍</span></h1>
+        <p id="host-info" class="mono text-xs text-slate-500 mt-1" data-i18n="host.waiting">waiting for server info…</p>
+      </div>
+      <div class="flex items-center gap-3">
+      <div id="lang" class="mono text-xs flex gap-1" role="group" aria-label="Language">
+        <button data-lang="en" class="rounded-md px-2 py-1 border border-white/15 hover:bg-white/10 aria-pressed:bg-white/15 aria-pressed:text-white" aria-pressed="true">EN</button>
+        <button data-lang="tr" class="rounded-md px-2 py-1 border border-white/15 hover:bg-white/10 aria-pressed:bg-white/15 aria-pressed:text-white" aria-pressed="false">TR</button>
+      </div>
+      <div class="glass rounded-full px-4 py-1.5 text-sm flex items-center gap-2" role="status" aria-live="polite">
+        <span id="status-dot" class="pulse h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <article class="glass rounded-2xl p-5 flex items-center gap-4">
+        <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90 shrink-0" aria-hidden="true">
+          <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8"/>
+          <circle id="cpu-ring" class="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+        </svg>
+        <div><p class="text-xs text-slate-400">CPU</p><p class="mono text-2xl font-bold text-white tab"><span id="cpu-text">–</span><span class="text-sm text-slate-500">%</span></p></div>
+      </article>
+      <article class="glass rounded-2xl p-5 flex items-center gap-4">
+        <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90 shrink-0" aria-hidden="true">
+          <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8"/>
+          <circle id="ram-ring" class="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+        </svg>
+        <div><p class="text-xs text-slate-400">RAM</p><p class="mono text-2xl font-bold text-white tab"><span id="ram-text">–</span><span class="text-sm text-slate-500">%</span></p><p id="ram-detail" class="mono text-xs text-slate-500 tab">–</p></div>
+      </article>
+      <article class="glass rounded-2xl p-5">
+        <p class="text-xs text-slate-400" data-i18n="net.title">Network traffic</p>
+        <p class="mono mt-2 text-lg tab text-white"><span style="color:var(--accent)">↓</span> <span id="rx-text">–</span></p>
+        <p class="mono text-lg tab text-white"><span style="color:var(--violet)">↑</span> <span id="tx-text">–</span></p>
+      </article>
+      <article class="glass rounded-2xl p-5">
+        <p class="text-xs text-slate-400" data-i18n="uptime.title">Uptime</p>
+        <p id="uptime-text" class="mono mt-2 text-2xl font-bold text-white tab">–</p>
+        <p class="text-xs text-slate-500 mt-1" data-i18n="uptime.since">since last boot</p>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <article class="glass rounded-2xl p-5">
+        <h2 class="text-sm font-medium mb-3"><span data-i18n="chart.cpuram">CPU &amp; RAM</span> <span class="text-slate-500 font-normal">· <span data-i18n="chart.last60">last 60 samples</span></span></h2>
+        <div class="relative h-60"><canvas id="cpu-chart" role="img" aria-label="CPU and RAM line chart" data-i18n-aria="chart.cpuram.aria"></canvas></div>
+      </article>
+      <article class="glass rounded-2xl p-5">
+        <h2 class="text-sm font-medium mb-3"><span data-i18n="net.title">Network traffic</span> <span class="text-slate-500 font-normal">· KB/s</span></h2>
+        <div class="relative h-60"><canvas id="net-chart" role="img" aria-label="Network traffic line chart" data-i18n-aria="chart.net.aria"></canvas></div>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <article class="glass rounded-2xl p-5 lg:col-span-2">
+        <h2 class="text-sm font-medium mb-1" data-i18n="svc.title">Service status</h2>
+        <p class="text-xs text-slate-500 mb-2" data-i18n="svc.sub">Checked every 10 seconds</p>
+        <ul id="services" class="divide-y divide-white/5 text-sm"></ul>
+      </article>
+      <article class="glass rounded-2xl p-5 lg:col-span-3">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-medium" data-i18n="log.title">Event log</h2>
+            <p id="limits" class="text-xs text-slate-500"></p>
+          </div>
+          <button id="test-btn" class="mono text-xs rounded-lg px-3 py-1.5 border border-white/15 hover:bg-white/10 transition-colors" data-i18n="test.btn">Test alert</button>
+        </div>
+        <ul id="log" class="mono text-xs space-y-1.5 h-44 overflow-y-auto pr-2"></ul>
+      </article>
+    </section>
+
+    <footer class="mono text-xs text-slate-500 mt-8 flex flex-wrap justify-between gap-2">
+      <span>Zeix (Bydefuse) · Node.js · WebSocket · Chart.js</span>
+      <span><a class="hover:text-white" href="https://zeix-portfolio.netlify.app/" target="_blank" rel="noopener" data-i18n="footer.portfolio">portfolio</a> · <a class="hover:text-white" href="https://github.com/bydefuse" target="_blank" rel="noopener">github</a></span>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
