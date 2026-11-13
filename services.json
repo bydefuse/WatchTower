@@ -1,0 +1,6 @@
+[
+  { "name": "Watchtower (this panel)", "type": "http", "target": "http://127.0.0.1:{PORT}/health" },
+  { "name": "Apache (XAMPP)", "type": "tcp", "target": "127.0.0.1:80" },
+  { "name": "MySQL", "type": "tcp", "target": "127.0.0.1:3306" },
+  { "name": "Cloudflare DNS", "type": "tcp", "target": "1.1.1.1:53" }
+]

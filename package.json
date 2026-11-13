@@ -1,0 +1,20 @@
+{
+  "name": "bydefuse-watchtower",
+  "version": "2.0.0",
+  "description": "Gerçek zamanlı sistem, ağ ve servis izleme paneli (WebSocket, Node.js)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": { "node": ">=20.12" },
+  "author": "Zeix (Bydefuse)",
+  "keywords": ["monitoring", "websocket", "nodejs", "dashboard", "chartjs", "system-monitor"],
+  "repository": { "type": "git", "url": "git+https://github.com/bydefuse/watchtower.git" },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "systeminformation": "^5.22.0",
+    "ws": "^8.17.0"
+  }
+}
